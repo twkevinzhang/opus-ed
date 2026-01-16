@@ -75,6 +75,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
+@reference "./index.css";
+
 .nav-item {
   @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold transition-all duration-200 
          hover:bg-white/5 hover:text-white;
