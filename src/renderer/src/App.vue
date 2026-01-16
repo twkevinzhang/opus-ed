@@ -1,31 +1,40 @@
 <script setup lang="ts">
-// 範例：使用 TypeScript
-const versions = { ...window.electron?.process.versions };
+import { onMounted } from "vue";
+import { useTaskStore } from "./store/useTaskStore";
+
+const taskStore = useTaskStore();
+
+onMounted(() => {
+  taskStore.fetchTasks();
+});
 </script>
 
 <template>
-  <div class="container">
-    <h1>OpusED TypeScript + DDD 初始化完成</h1>
-    <div class="versions">
-      <p>Electron v{{ versions.electron }}</p>
-      <p>Node v{{ versions.node }}</p>
-      <p>Vite v{{ versions.vite }}</p>
-    </div>
-    <div class="status-box">
-      <p>MCP 遠端除錯埠 9222 已配置</p>
-      <p>架構風格: DDD (domain, application, infrastructure)</p>
-    </div>
+  <div class="app-wrapper">
+    <!-- 頂部裝飾列 -->
+    <header class="top-nav glass-card">
+      <div class="logo">Opus<span>ED</span></div>
+      <nav class="nav-links">
+        <router-link to="/batch-input" class="nav-item">批次初始化</router-link>
+        <router-link to="/preview-edit" class="nav-item"
+          >預覽與編輯</router-link
+        >
+        <router-link to="/dashboard" class="nav-item">儀表板</router-link>
+      </nav>
+    </header>
+
+    <main class="content-area">
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </main>
   </div>
 </template>
 
-<style scoped>
-.container {
-  font-family: "Inter", system-ui, sans-serif;
-  text-align: center;
-  padding: 40px;
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-  height: 100vh;
+<style>
+.app-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;

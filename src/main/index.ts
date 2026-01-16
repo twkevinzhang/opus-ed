@@ -1,6 +1,14 @@
-import { app, shell, BrowserWindow } from "electron";
+import { app, shell, BrowserWindow, ipcMain } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+
+import { IPC_CHANNELS } from "../shared/constants";
+import { TaskRepository } from "./infrastructure/TaskRepository";
+import { BatchManagementService } from "./application/BatchManagementService";
+
+// 初始化基礎設施與服務
+const taskRepo = new TaskRepository();
+const batchService = new BatchManagementService(taskRepo);
 
 function createWindow(): void {
   // 建立瀏覽器視窗
@@ -50,6 +58,7 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+  setupIpc();
 
   app.on("activate", function () {
     // 在 macOS 上，當點擊 dock 圖示且沒有其他視窗開啟時，通常會重新建立一個視窗
@@ -63,3 +72,33 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+function setupIpc(): void {
+  ipcMain.handle(IPC_CHANNELS.GET_ALL_TASKS, async () => {
+    return await taskRepo.getAllTasks();
+  });
+
+  ipcMain.handle(IPC_CHANNELS.GET_HISTORY, async () => {
+    return await taskRepo.getHistory();
+  });
+
+  ipcMain.handle(
+    IPC_CHANNELS.CREATE_BATCH_TASKS,
+    async (_, { titles, targetDir, source, dmhyMode, token }) => {
+      return await batchService.createBatchTasks(
+        titles,
+        targetDir,
+        source,
+        dmhyMode,
+        token
+      );
+    }
+  );
+
+  ipcMain.handle(IPC_CHANNELS.START_DOWNLOAD, async (_, taskId) => {
+    return await batchService.startDownload(taskId);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.DELETE_TASK, async (_, taskId) => {
+    return await taskRepo.deleteTask(taskId);
+  });
+}

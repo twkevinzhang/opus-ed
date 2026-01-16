@@ -1,21 +1,35 @@
-import { contextBridge } from "electron";
-import { exposeElectronAPI } from "@electron-toolkit/preload";
+import { contextBridge, ipcRenderer } from "electron";
+import { electronAPI } from "@electron-toolkit/preload";
+import { IPC_CHANNELS } from "../shared/constants";
 
-// 為渲染進程暴露客製化 API
-const api = {};
+// 自定義渲染進程 API
+const api = {
+  getTasks: () => ipcRenderer.invoke(IPC_CHANNELS.GET_ALL_TASKS),
+  getHistory: () => ipcRenderer.invoke(IPC_CHANNELS.GET_HISTORY),
+  createBatchTasks: (data: {
+    titles: string[];
+    targetDir: string;
+    source: string;
+    dmhyMode: string;
+    token?: string;
+  }) => ipcRenderer.invoke(IPC_CHANNELS.CREATE_BATCH_TASKS, data),
+  startDownload: (taskId: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.START_DOWNLOAD, taskId),
+  deleteTask: (taskId: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.DELETE_TASK, taskId),
+};
 
-// 只有在啟用上下文隔離的情況下才使用 `contextBridge` API，
-// 否則直接掛載到全域 window 物件
+// 使用 contextIsolation 曝露 API
 if (process.contextIsolated) {
   try {
-    exposeElectronAPI();
+    contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);
   }
 } else {
-  // @ts-ignore (define in d.ts)
+  // @ts-ignore (用於無隔離環境)
   window.electron = electronAPI;
-  // @ts-ignore (define in d.ts)
+  // @ts-ignore
   window.api = api;
 }
