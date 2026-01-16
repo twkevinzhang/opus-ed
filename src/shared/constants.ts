@@ -5,4 +5,5 @@ export const IPC_CHANNELS = {
   GET_HISTORY: "get-history",
   START_DOWNLOAD: "start-download",
   DELETE_TASK: "delete-task",
+  SELECT_DIRECTORY: "select-directory",
 };

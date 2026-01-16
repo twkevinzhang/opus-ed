@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 
@@ -18,7 +18,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     webPreferences: {
-      preload: join(__dirname, "../preload/index.mjs"),
+      preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
     },
   });
@@ -100,5 +100,18 @@ function setupIpc(): void {
 
   ipcMain.handle(IPC_CHANNELS.DELETE_TASK, async (_, taskId) => {
     return await taskRepo.deleteTask(taskId);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.SELECT_DIRECTORY, async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory", "createDirectory"],
+      title: "選擇下載目錄",
+    });
+
+    if (result.canceled) {
+      return null;
+    }
+
+    return result.filePaths[0];
   });
 }

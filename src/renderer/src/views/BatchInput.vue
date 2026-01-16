@@ -15,6 +15,13 @@ const bangumiToken = ref("");
 
 const isProcessing = ref(false);
 
+const handleSelectDirectory = async () => {
+  const path = await window.api.selectDirectory();
+  if (path) {
+    targetDir.value = path;
+  }
+};
+
 const handleNext = async () => {
   if (!rawTitles.value || !targetDir.value) {
     alert("請輸入動畫清單與下載路徑");
@@ -73,12 +80,22 @@ const handleNext = async () => {
           <label class="text-sm font-semibold text-slate-400 ml-1"
             >下載路徑</label
           >
-          <input
-            v-model="targetDir"
-            type="text"
-            class="input-field"
-            placeholder="/path/to/downloads"
-          />
+          <div class="flex gap-2">
+            <input
+              v-model="targetDir"
+              type="text"
+              class="input-field flex-1"
+              placeholder="/path/to/downloads"
+            />
+            <button
+              type="button"
+              @click="handleSelectDirectory"
+              class="px-4 py-2 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-colors border border-slate-600/50 hover:border-slate-500"
+              title="選擇資料夾"
+            >
+              📁
+            </button>
+          </div>
         </div>
 
         <!-- 下載來源 -->
