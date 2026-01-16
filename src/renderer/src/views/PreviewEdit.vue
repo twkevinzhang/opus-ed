@@ -19,6 +19,15 @@ const handleStartAll = async () => {
 const removeTask = (id: string) => {
   taskStore.removeTask(id);
 };
+
+const getDefaultKeywords = (task: any) => {
+  if (!task.metadata) return "";
+  let query = `${task.metadata.anime_title} ${task.metadata.song_title}`;
+  if (task.source === "youtube") {
+    query += ` ${task.metadata.type}`;
+  }
+  return query;
+};
 </script>
 
 <template>
@@ -133,45 +142,52 @@ const removeTask = (id: string) => {
           </div>
 
           <!-- 自定義關鍵字 -->
-          <div class="flex flex-col gap-1">
-            <label
-              class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
-              >自定義搜尋關鍵字 (覆蓋自動生成字串)</label
-            >
+          <div class="mt-6 pt-3 border-t border-white/5"></div>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <label
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+                >至</label
+              >
+              <span
+                class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter"
+                :class="
+                  task.source === 'youtube'
+                    ? 'bg-red-500 text-white'
+                    : 'bg-emerald-500 text-white'
+                "
+              >
+                {{ task.source }}
+              </span>
+              <label
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+                >中搜尋...</label
+              >
+            </div>
             <input
               v-model="task.custom_keywords"
               type="text"
               class="input-field !py-2 !px-3 bg-indigo-500/5 focus:bg-indigo-500/10 placeholder:text-slate-600"
-              placeholder="例如：動畫名 OP 無損"
+              :placeholder="getDefaultKeywords(task)"
             />
+            <div class="flex items-center gap-2">
+              <div class="flex items-center">
+                <span
+                  v-if="task.dmhy_mode"
+                  class="px-2 py-0.5 rounded bg-slate-700 text-white text-[10px] font-bold uppercase"
+                >
+                  {{ task.dmhy_mode }}
+                </span>
+              </div>
+              <span
+                class="text-[11px] text-slate-500 flex items-center gap-2 font-medium"
+              >
+                <span>下載到</span>
+                <span class="opacity-50 text-base">📂</span>
+                <span>{{ task.target_dir }}</span>
+              </span>
+            </div>
           </div>
-        </div>
-
-        <!-- 頁尾資訊 -->
-        <div class="flex items-center gap-4 mt-6 pt-4 border-t border-white/5">
-          <div class="flex items-center gap-2">
-            <span
-              class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter"
-              :class="
-                task.source === 'youtube'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-emerald-500 text-white'
-              "
-            >
-              {{ task.source }}
-            </span>
-            <span
-              v-if="task.dmhy_mode"
-              class="px-2 py-0.5 rounded bg-slate-700 text-white text-[10px] font-bold uppercase"
-            >
-              {{ task.dmhy_mode }}
-            </span>
-          </div>
-          <span
-            class="text-[11px] text-slate-500 flex items-center gap-1 font-medium"
-          >
-            <span class="opacity-50 text-base">📂</span> {{ task.target_dir }}
-          </span>
         </div>
       </div>
     </div>
