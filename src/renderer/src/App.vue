@@ -10,22 +10,63 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="app-wrapper">
-    <!-- 頂部裝飾列 -->
-    <header class="top-nav glass-card">
-      <div class="logo">Opus<span>ED</span></div>
-      <nav class="nav-links">
-        <router-link to="/batch-input" class="nav-item">批次初始化</router-link>
-        <router-link to="/preview-edit" class="nav-item"
-          >預覽與編輯</router-link
+  <div class="flex h-screen bg-[#0f172a]">
+    <!-- Sidebar -->
+    <aside class="w-64 glass-card m-4 mr-0 flex flex-col">
+      <div class="p-8">
+        <h1 class="text-3xl font-bold font-outfit tracking-tighter">
+          Opus<span class="text-indigo-500">ED</span>
+        </h1>
+        <p
+          class="text-xs text-slate-400 mt-1 font-medium uppercase tracking-widest"
         >
-        <router-link to="/dashboard" class="nav-item">儀表板</router-link>
-      </nav>
-    </header>
+          AI AI OP/ED Getter
+        </p>
+      </div>
 
-    <main class="content-area">
+      <nav class="flex-1 px-4 space-y-2">
+        <router-link to="/batch-input" class="nav-item group">
+          <span class="text-lg group-hover:scale-110 transition-transform"
+            >📥</span
+          >
+          批次初始化
+        </router-link>
+        <router-link to="/preview-edit" class="nav-item group">
+          <span class="text-lg group-hover:scale-110 transition-transform"
+            >🔍</span
+          >
+          預覽與編輯
+        </router-link>
+        <router-link to="/dashboard" class="nav-item group">
+          <span class="text-lg group-hover:scale-110 transition-transform"
+            >📊</span
+          >
+          下載儀表板
+        </router-link>
+      </nav>
+
+      <div class="p-4 border-t border-white/5">
+        <div
+          class="p-4 glass-card bg-white/5 text-[10px] text-slate-500 uppercase tracking-tighter"
+        >
+          Sidecar:
+          <span class="text-emerald-500 font-bold ml-1">Stateless</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col p-8 overflow-hidden">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="transform translate-y-4 opacity-0"
+          enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform translate-y--4 opacity-0"
+          mode="out-in"
+        >
           <component :is="Component" />
         </transition>
       </router-view>
@@ -33,24 +74,13 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
-.app-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+<style scoped>
+.nav-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 font-semibold transition-all duration-200 
+         hover:bg-white/5 hover:text-white;
 }
-.versions {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 20px 0;
-  font-family: monospace;
-}
-.status-box {
-  background: #2d2d2d;
-  border-left: 4px solid #646cff;
-  padding: 15px;
-  max-width: 500px;
-  margin: 0 auto;
+
+.router-link-active {
+  @apply bg-indigo-500/10 text-white shadow-lg shadow-indigo-500/10 border border-indigo-500/20;
 }
 </style>

@@ -16,26 +16,26 @@ export class TaskRepository {
     this.historyPath = path.join(dataDir, "history.json");
 
     // 初始化檔案
-    if (!fs.existsSync(this._activeTasksPath))
-      fs.writeJsonSync(this._activeTasksPath, []);
-    if (!fs.existsSync(this._historyPath))
-      fs.writeJsonSync(this._historyPath, []);
+    if (!fs.existsSync(this.activeTasksPath))
+      fs.writeJsonSync(this.activeTasksPath, []);
+    if (!fs.existsSync(this.historyPath))
+      fs.writeJsonSync(this.historyPath, []);
   }
 
   // 為了測試或備份方便，暴露路徑
-  private get _activeTasksPath(): string {
+  public get activeTasksFilePath(): string {
     return this.activeTasksPath;
   }
-  private get _historyPath(): string {
+  public get historyFilePath(): string {
     return this.historyPath;
   }
 
   async getAllTasks(): Promise<Task[]> {
-    return await fs.readJson(this._activeTasksPath);
+    return await fs.readJson(this.activeTasksPath);
   }
 
   async getHistory(): Promise<Task[]> {
-    return await fs.readJson(this._historyPath);
+    return await fs.readJson(this.historyPath);
   }
 
   async getById(taskId: string): Promise<Task | undefined> {
@@ -51,19 +51,19 @@ export class TaskRepository {
     } else {
       tasks.push(task);
     }
-    await fs.writeJson(this._activeTasksPath, tasks, { spaces: 2 });
+    await fs.writeJson(this.activeTasksPath, tasks, { spaces: 2 });
   }
 
   async saveBatchTasks(newTasks: Task[]): Promise<void> {
     const tasks = await this.getAllTasks();
     tasks.push(...newTasks);
-    await fs.writeJson(this._activeTasksPath, tasks, { spaces: 2 });
+    await fs.writeJson(this.activeTasksPath, tasks, { spaces: 2 });
   }
 
   async deleteTask(taskId: string): Promise<void> {
     const tasks = await this.getAllTasks();
     const filtered = tasks.filter((t) => t.id !== taskId);
-    await fs.writeJson(this._activeTasksPath, filtered, { spaces: 2 });
+    await fs.writeJson(this.activeTasksPath, filtered, { spaces: 2 });
   }
 
   async moveToHistory(task: Task): Promise<void> {
@@ -73,6 +73,6 @@ export class TaskRepository {
     // 2. 加入歷史紀錄
     const history = await this.getHistory();
     history.push(task);
-    await fs.writeJson(this._historyPath, history, { spaces: 2 });
+    await fs.writeJson(this.historyPath, history, { spaces: 2 });
   }
 }

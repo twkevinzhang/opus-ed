@@ -22,225 +22,158 @@ const removeTask = (id: string) => {
 </script>
 
 <template>
-  <div class="view-container">
-    <div class="header-row">
-      <h2 class="title">🔍 預覽與校對 ({{ tasks.length }})</h2>
-      <div class="global-actions">
-        <button
-          class="btn-primary"
-          @click="handleStartAll"
-          :disabled="tasks.length === 0"
-        >
-          🚀 啟動所有任務下載
-        </button>
+  <div class="flex flex-col h-full overflow-hidden">
+    <div class="flex justify-between items-center mb-8">
+      <h2
+        class="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
+      >
+        🔍 預覽與校對 ({{ tasks.length }})
+      </h2>
+      <button
+        class="btn-primary"
+        @click="handleStartAll"
+        :disabled="tasks.length === 0"
+      >
+        🚀 啟動所有任務下載
+      </button>
+    </div>
+
+    <!-- 空狀態 -->
+    <div
+      v-if="tasks.length === 0"
+      class="flex-1 flex items-center justify-center"
+    >
+      <div class="glass-card p-12 text-center max-w-md">
+        <p class="text-slate-400 text-lg">
+          目前沒有待處理的任務，請先前往「批次初始化」頁面。
+        </p>
       </div>
     </div>
 
-    <div v-if="tasks.length === 0" class="empty-state glass-card">
-      <p>目前沒有待處理的任務，請先前往「批次初始化」頁面。</p>
-    </div>
-
-    <div class="task-list scrollable">
-      <div v-for="task in tasks" :key="task.id" class="task-card glass-card">
-        <div class="card-header">
-          <span class="anime-title">{{ task.anime_title }}</span>
-          <button
-            class="btn-icon delete"
-            @click="removeTask(task.id)"
-            title="刪除任務"
+    <!-- 任務清單 -->
+    <div v-else class="flex-1 scrollable space-y-4">
+      <div
+        v-for="task in tasks"
+        :key="task.id"
+        class="glass-card p-6 group transition-all duration-300 hover:translate-x-1"
+      >
+        <div class="flex justify-between items-start mb-4">
+          <span
+            class="text-xl font-bold text-indigo-400 flex items-center gap-2"
           >
-            ✕
+            <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
+            {{ task.anime_title }}
+          </span>
+          <button
+            class="text-slate-500 hover:text-red-500 transition-colors p-1"
+            @click="removeTask(task.id)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
 
-        <div class="card-body">
-          <div v-if="task.metadata" class="meta-inputs">
-            <div class="input-block">
-              <label>歌曲類型</label>
+        <div class="space-y-4">
+          <!-- 元數據輸入 -->
+          <div v-if="task.metadata" class="grid grid-cols-6 gap-4">
+            <div class="col-span-1 flex flex-col gap-1">
+              <label
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+                >類型</label
+              >
               <input
                 v-model="task.metadata.type"
                 type="text"
-                class="input-field minimal"
+                class="input-field !py-2 !px-3"
                 placeholder="OP/ED"
               />
             </div>
-            <div class="input-block">
-              <label>歌曲名稱</label>
+            <div class="col-span-2 flex flex-col gap-1">
+              <label
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+                >歌曲名稱</label
+              >
               <input
                 v-model="task.metadata.song_title"
                 type="text"
-                class="input-field minimal"
+                class="input-field !py-2 !px-3"
                 placeholder="標題"
               />
             </div>
-            <div class="input-block">
-              <label>演唱者</label>
+            <div class="col-span-3 flex flex-col gap-1">
+              <label
+                class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+                >演唱者</label
+              >
               <input
                 v-model="task.metadata.artist"
                 type="text"
-                class="input-field minimal"
+                class="input-field !py-2 !px-3"
                 placeholder="歌手"
               />
             </div>
           </div>
-          <div v-else class="no-meta-warning">
-            ⚠️ 未獲取到自動元數據，請手動輸入或在下方使用關鍵字搜尋。
+          <div
+            v-else
+            class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-amber-500 text-sm flex items-center gap-2"
+          >
+            <span>⚠️</span> 未獲取到自動元數據，請手動輸入關鍵字搜尋。
           </div>
 
-          <div class="keywords-block">
-            <label>自定義搜尋關鍵字 (選填, 將覆蓋自動生成之字串)</label>
+          <!-- 自定義關鍵字 -->
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1"
+              >自定義搜尋關鍵字 (覆蓋自動生成字串)</label
+            >
             <input
               v-model="task.custom_keywords"
               type="text"
-              class="input-field minimal"
-              placeholder="例如：動畫名 OP"
+              class="input-field !py-2 !px-3 bg-indigo-500/5 focus:bg-indigo-500/10 placeholder:text-slate-600"
+              placeholder="例如：動畫名 OP 無損"
             />
           </div>
         </div>
 
-        <div class="card-footer">
-          <span class="source-badge" :class="task.source">{{
-            task.source.toUpperCase()
-          }}</span>
-          <span v-if="task.dmhy_mode" class="mode-badge">{{
-            task.dmhy_mode
-          }}</span>
-          <span class="path-text">📂 {{ task.target_dir }}</span>
+        <!-- 頁尾資訊 -->
+        <div class="flex items-center gap-4 mt-6 pt-4 border-t border-white/5">
+          <div class="flex items-center gap-2">
+            <span
+              class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-tighter"
+              :class="
+                task.source === 'youtube'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-emerald-500 text-white'
+              "
+            >
+              {{ task.source }}
+            </span>
+            <span
+              v-if="task.dmhy_mode"
+              class="px-2 py-0.5 rounded bg-slate-700 text-white text-[10px] font-bold uppercase"
+            >
+              {{ task.dmhy_mode }}
+            </span>
+          </div>
+          <span
+            class="text-[11px] text-slate-500 flex items-center gap-1 font-medium"
+          >
+            <span class="opacity-50 text-base">📂</span> {{ task.target_dir }}
+          </span>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.view-container {
-  padding: 24px 40px;
-  max-width: 1000px;
-  margin: 0 auto;
-  height: calc(100vh - 100px);
-  display: flex;
-  flex-direction: column;
-}
-
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.title {
-  margin: 0;
-  font-size: 28px;
-  background: linear-gradient(135deg, white, var(--text-muted));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.task-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-right: 8px;
-}
-
-.task-card {
-  padding: 20px;
-  transition: transform 0.2s;
-}
-
-.task-card:hover {
-  transform: translateX(4px);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.anime-title {
-  font-family: "Outfit", sans-serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary);
-}
-
-.meta-inputs {
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.input-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.input-block label,
-.keywords-block label {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.input-field.minimal {
-  padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.source-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 800;
-  font-size: 10px;
-}
-
-.source-badge.youtube {
-  background: #ef4444;
-  color: white;
-}
-.source-badge.dmhy {
-  background: #10b981;
-  color: white;
-}
-
-.mode-badge {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.btn-icon.delete {
-  background: none;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 18px;
-  opacity: 0.6;
-}
-
-.btn-icon.delete:hover {
-  opacity: 1;
-}
-
-.empty-state {
-  padding: 60px;
-  text-align: center;
-  color: var(--text-muted);
-}
-</style>

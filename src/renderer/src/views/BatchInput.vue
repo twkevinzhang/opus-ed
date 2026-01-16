@@ -45,25 +45,34 @@ const handleNext = async () => {
 </script>
 
 <template>
-  <div class="view-container">
-    <div class="glass-card main-form">
-      <h2 class="title">🎬 批次任務初始化</h2>
+  <div class="max-w-4xl">
+    <h2
+      class="text-3xl font-bold mb-8 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
+    >
+      🎬 批次任務初始化
+    </h2>
 
-      <div class="input-group">
-        <label>動畫清單 (每行一個標題)</label>
+    <div class="glass-card p-8 space-y-6">
+      <!-- 動畫清單 -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-semibold text-slate-400 ml-1"
+          >動畫清單 (每行一個標題)</label
+        >
         <textarea
           v-model="rawTitles"
-          class="input-field scrollable"
+          class="input-field scrollable min-h-[200px] resize-none"
           placeholder="例如：
 葬送的芙莉蓮
 我推的孩子"
-          rows="8"
         ></textarea>
       </div>
 
-      <div class="grid-form">
-        <div class="input-group">
-          <label>下載路徑</label>
+      <div class="grid grid-cols-2 gap-6">
+        <!-- 下載路徑 -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-400 ml-1"
+            >下載路徑</label
+          >
           <input
             v-model="targetDir"
             type="text"
@@ -72,96 +81,52 @@ const handleNext = async () => {
           />
         </div>
 
-        <div class="input-group">
-          <label>下載來源</label>
-          <select v-model="source" class="input-field">
+        <!-- 下載來源 -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-400 ml-1"
+            >下載來源</label
+          >
+          <select v-model="source" class="input-field cursor-pointer">
             <option :value="Source.YOUTUBE">YouTube (最佳音質/畫質)</option>
             <option :value="Source.DMHY">動漫花園 (BT 資源)</option>
           </select>
         </div>
 
-        <div v-if="source === Source.DMHY" class="input-group">
-          <label>DMHY 模式</label>
-          <select v-model="dmhyMode" class="input-field">
+        <!-- DMHY 模式 -->
+        <div v-if="source === Source.DMHY" class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-400 ml-1"
+            >DMHY 模式</label
+          >
+          <select v-model="dmhyMode" class="input-field cursor-pointer">
             <option :value="DownloadMode.VIDEO">自動下載影片 (建議)</option>
             <option :value="DownloadMode.TORRENT">僅存儲種子檔案</option>
           </select>
         </div>
 
-        <div class="input-group">
-          <label>Bangumi Token (選填)</label>
+        <!-- Bangumi Token -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-400 ml-1"
+            >Bangumi Token (選填)</label
+          >
           <input
             v-model="bangumiToken"
             type="password"
             class="input-field"
-            placeholder="提高 Bangumi API 取得率"
+            placeholder="提高 API 成功率"
           />
         </div>
       </div>
 
-      <div class="actions">
+      <!-- 送出按鈕 -->
+      <div class="flex justify-end pt-4">
         <button
-          class="btn-primary"
+          class="btn-primary min-w-[200px]"
           @click="handleNext"
           :disabled="isProcessing"
         >
-          {{ isProcessing ? "搜尋中..." : "下一步：校對元數據 ➔" }}
+          {{ isProcessing ? "🚀 搜尋中..." : "下一步：校對元數據 ➔" }}
         </button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.view-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 40px;
-}
-
-.main-form {
-  width: 100%;
-  max-width: 800px;
-  padding: 32px;
-}
-
-.title {
-  margin-top: 0;
-  margin-bottom: 24px;
-  background: linear-gradient(135deg, white, var(--text-muted));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.input-group label {
-  font-size: 14px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.grid-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-textarea {
-  resize: vertical;
-}
-</style>

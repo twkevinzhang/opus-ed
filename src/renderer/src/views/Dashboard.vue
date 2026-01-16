@@ -36,211 +36,113 @@ const getStatusLabel = (status: string) => {
 </script>
 
 <template>
-  <div class="view-container">
-    <div class="header-row">
-      <h2 class="title">📊 下載儀表板</h2>
-      <div class="stats">
-        <span>全部: {{ tasks.length }}</span> |
-        <span class="text-success"
-          >完成:
-          {{ tasks.filter((t) => t.status === "completed").length }}</span
+  <div class="flex flex-col h-full overflow-hidden">
+    <!-- 標題與統計 -->
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <h2
+          class="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
         >
-        |
-        <span class="text-error"
-          >失敗: {{ tasks.filter((t) => t.status === "failed").length }}</span
+          📊 下載儀表板
+        </h2>
+        <div
+          class="flex gap-4 mt-2 text-xs font-bold uppercase tracking-widest text-slate-500"
         >
+          <span>全部: {{ tasks.length }}</span>
+          <span class="text-emerald-500"
+            >完成:
+            {{ tasks.filter((t) => t.status === "completed").length }}</span
+          >
+          <span class="text-red-500"
+            >失敗: {{ tasks.filter((t) => t.status === "failed").length }}</span
+          >
+        </div>
       </div>
     </div>
 
-    <div v-if="tasks.length === 0" class="empty-state glass-card">
-      <p>目前沒有下載中的任務。</p>
+    <!-- 空狀態 -->
+    <div
+      v-if="tasks.length === 0"
+      class="flex-1 flex items-center justify-center"
+    >
+      <div class="glass-card p-12 text-center max-w-md">
+        <p class="text-slate-400 text-lg">目前沒有下載中的任務。</p>
+      </div>
     </div>
 
-    <div class="monitor-list scrollable">
+    <!-- 監控清單 -->
+    <div v-else class="flex-1 scrollable space-y-3">
       <div
         v-for="task in tasks"
         :key="task.id"
-        class="monitor-card glass-card"
-        :class="task.status"
+        class="glass-card p-5 border-l-4 transition-all duration-300"
+        :class="{
+          'border-indigo-500 bg-indigo-500/5': task.status === 'downloading',
+          'border-emerald-500 bg-emerald-500/5': task.status === 'completed',
+          'border-red-500 bg-red-500/5': task.status === 'failed',
+          'border-slate-700': task.status === 'pending',
+        }"
       >
-        <div class="task-info">
-          <div class="meta">
-            <span class="anime">{{ task.anime_title }}</span>
-            <span class="song" v-if="task.metadata"
-              >{{ task.metadata.song_title }} - {{ task.metadata.artist }}</span
+        <div class="flex justify-between items-start mb-3">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-200">{{ task.anime_title }}</span>
+            <span
+              v-if="task.metadata"
+              class="text-xs text-slate-500 font-medium"
             >
+              {{ task.metadata.song_title }} - {{ task.metadata.artist }}
+            </span>
           </div>
-          <div class="status-badge" :class="task.status">
+          <div
+            class="text-[10px] font-black uppercase tracking-tighter px-2 py-1 rounded"
+            :class="{
+              'bg-indigo-500/20 text-indigo-400': task.status === 'downloading',
+              'bg-emerald-500/20 text-emerald-400': task.status === 'completed',
+              'bg-red-500/20 text-red-400': task.status === 'failed',
+              'bg-slate-800 text-slate-500': task.status === 'pending',
+            }"
+          >
             {{ getStatusLabel(task.status) }}
           </div>
         </div>
 
-        <div class="progress-section">
-          <div class="progress-bar-container">
+        <!-- 進度條 -->
+        <div class="flex items-center gap-4">
+          <div class="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden">
             <div
-              class="progress-fill"
+              class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out"
               :style="{ width: task.progress + '%' }"
             ></div>
           </div>
-          <span class="percentage">{{ task.progress.toFixed(1) }}%</span>
+          <span
+            class="text-[10px] font-mono font-bold text-slate-400 w-10 text-right"
+          >
+            {{ task.progress.toFixed(1) }}%
+          </span>
         </div>
 
-        <div v-if="task.error_message" class="error-msg">
-          ⚠️ {{ task.error_message }}
+        <!-- 錯誤訊息 -->
+        <div
+          v-if="task.error_message"
+          class="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded text-[10px] text-red-400 font-medium flex items-center gap-2"
+        >
+          <span>⚠️</span> {{ task.error_message }}
         </div>
 
-        <div class="footer">
-          <span>來源: {{ task.source }}</span>
-          <span>路徑: {{ task.target_dir }}</span>
+        <!-- 頁尾 -->
+        <div
+          class="mt-3 pt-3 border-t border-white/5 flex gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest"
+        >
+          <span class="flex items-center gap-1"
+            ><span class="text-base leading-none">🌐</span>
+            {{ task.source }}</span
+          >
+          <span class="flex items-center gap-1"
+            ><span class="text-base leading-none">📂</span>
+            {{ task.target_dir }}</span
+          >
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.view-container {
-  padding: 24px 40px;
-  max-width: 1000px;
-  margin: 0 auto;
-  height: calc(100vh - 100px);
-  display: flex;
-  flex-direction: column;
-}
-
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.stats {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.monitor-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-right: 8px;
-}
-
-.monitor-card {
-  padding: 16px 20px;
-  border-left: 4px solid transparent;
-}
-
-.monitor-card.downloading {
-  border-left-color: var(--primary);
-}
-.monitor-card.completed {
-  border-left-color: #10b981;
-}
-.monitor-card.failed {
-  border-left-color: #ef4444;
-}
-
-.task-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.anime {
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.song {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.status-badge {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.status-badge.downloading {
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-}
-.status-badge.completed {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
-.status-badge.failed {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.progress-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.progress-bar-container {
-  flex: 1;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), #8b5cf6);
-  transition: width 0.3s ease;
-}
-
-.percentage {
-  font-size: 12px;
-  font-family: monospace;
-  width: 45px;
-  text-align: right;
-}
-
-.error-msg {
-  font-size: 12px;
-  color: #f87171;
-  margin-top: 8px;
-  padding: 8px;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 4px;
-}
-
-.footer {
-  margin-top: 12px;
-  display: flex;
-  gap: 20px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.text-success {
-  color: #10b981;
-}
-.text-error {
-  color: #ef4444;
-}
-
-.empty-state {
-  padding: 60px;
-  text-align: center;
-  color: var(--text-muted);
-}
-</style>

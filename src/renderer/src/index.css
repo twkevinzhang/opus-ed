@@ -1,87 +1,59 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@400;700&display=swap');
 
 :root {
   --primary: #6366f1;
-  --primary-hover: #4f46e5;
   --bg-dark: #0f172a;
-  --card-bg: rgba(30, 41, 59, 0.7);
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --border: rgba(255, 255, 255, 0.1);
   --glass: blur(12px) saturate(180%);
 }
 
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  background-color: var(--bg-dark);
-  background: radial-gradient(circle at top left, #1e293b, #0f172a);
-  color: var(--text-main);
-  min-height: 100vh;
-  overflow-x: hidden;
+@layer base {
+  body {
+    @apply m-0 font-sans text-white min-h-screen overflow-x-hidden;
+    background-color: var(--bg-dark);
+    background: radial-gradient(circle at top left, #1e293b, #0f172a);
+  }
+
+  h1, h2, h3 {
+    @apply font-outfit;
+  }
 }
 
-h1,
-h2,
-h3 {
-  font-family: "Outfit", sans-serif;
+@layer components {
+  .glass-card {
+    @apply bg-slate-800/70 border border-white/10 rounded-2xl shadow-2xl;
+    backdrop-filter: var(--glass);
+    -webkit-backdrop-filter: var(--glass);
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-br from-indigo-500 to-purple-600 text-white px-6 py-2.5 rounded-lg font-semibold 
+           transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40
+           flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50;
+  }
+
+  .input-field {
+    @apply bg-slate-900/50 border border-white/10 rounded-lg text-white px-3 py-3 text-sm outline-none 
+           transition-colors duration-200 focus:border-indigo-500;
+  }
 }
 
-.glass-card {
-  background: var(--card-bg);
-  backdrop-filter: var(--glass);
-  -webkit-backdrop-filter: var(--glass);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-}
+@layer utilities {
+  .scrollable {
+    @apply overflow-y-auto pr-2;
+  }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary), #8b5cf6);
-  color: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
-}
-
-.input-field {
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: white;
-  padding: 12px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.input-field:focus {
-  border-color: var(--primary);
-}
-
-/* 捲軸美化 */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  /* 捲軸美化 */
+  .scrollable::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollable::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollable::-webkit-scrollbar-thumb {
+    @apply bg-slate-700/50 rounded-full hover:bg-slate-600;
+  }
 }
