@@ -1,6 +1,6 @@
 from typing import List, Optional
 from sidecar.domain.models import Task, Metadata, Source, DownloadMode, TaskStatus
-from sidecar.domain.repositories import IMetadataProvider, IDownloader, ITaskRepository
+from sidecar.domain.repositories import IMetadataProvider, IDownloader
 
 class SearchMetadataUseCase:
     def __init__(self, metadata_provider: IMetadataProvider):

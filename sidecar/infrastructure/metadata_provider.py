@@ -1,5 +1,6 @@
 import httpx
 import logging
+import urllib.parse
 from typing import List, Optional, Dict, Any
 from sidecar.domain.models import Metadata
 from sidecar.domain.repositories import IMetadataProvider
@@ -23,8 +24,9 @@ class BangumiMetadataProvider(IMetadataProvider):
 
         async with httpx.AsyncClient(headers=headers, timeout=12.0, follow_redirects=True) as client:
             try:
-                # 1. 搜尋條目
-                search_url = f"{self.base_url}/search/subject/{anime_title}"
+                # 1. 搜尋條目 (使用 URL 編碼)
+                encoded_title = urllib.parse.quote(anime_title)
+                search_url = f"{self.base_url}/search/subject/{encoded_title}"
                 params = {"type": 2}  # 2 為動畫
                 response = await client.get(search_url, params=params)
                 response.raise_for_status()
