@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import { spawn, ChildProcess } from "child_process";
 
 import { IPC_CHANNELS } from "../shared/constants";
 import { TaskRepository } from "./infrastructure/TaskRepository";
@@ -10,9 +11,64 @@ import { BatchManagementService } from "./application/BatchManagementService";
 const taskRepo = new TaskRepository();
 const batchService = new BatchManagementService(taskRepo);
 
+let pythonProcess: ChildProcess | null = null;
+let mainWindow: BrowserWindow;
+
+function startSidecar() {
+  const isDev = is.dev;
+  let pythonExecutable = "python";
+  let args: string[] = [];
+
+  if (isDev) {
+    // 開發環境：使用 .venv 中的 python
+    pythonExecutable = join(process.cwd(), ".venv/bin/python");
+    args = [
+      "-m",
+      "uvicorn",
+      "sidecar.app.main:app",
+      "--port",
+      "8000",
+      "--reload",
+    ];
+  } else {
+    // 生產環境：預留邏輯，暫時不實作
+    console.log("Production sidecar not implemented yet.");
+    return;
+  }
+
+  console.log(`Starting Sidecar: ${pythonExecutable} ${args.join(" ")}`);
+
+  pythonProcess = spawn(pythonExecutable, args, {
+    cwd: process.cwd(),
+    shell: false,
+    // 注意：shell: true 可能會導致信號傳遞問題，這裡先設為 false
+    // 開發環境下 cwd 設為專案根目錄，以便 uvicorn 能找到 sidecar package
+  });
+
+  pythonProcess.stdout?.on("data", (data) => {
+    console.log(`[Sidecar]: ${data}`);
+  });
+
+  pythonProcess.stderr?.on("data", (data) => {
+    console.error(`[Sidecar Error]: ${data}`);
+  });
+
+  pythonProcess.on("close", (code) => {
+    console.log(`Sidecar process exited with code ${code}`);
+  });
+}
+
+function stopSidecar() {
+  if (pythonProcess) {
+    console.log("Stopping Sidecar...");
+    pythonProcess.kill();
+    pythonProcess = null;
+  }
+}
+
 function createWindow(): void {
   // 建立瀏覽器視窗
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -57,6 +113,7 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
+  startSidecar(); // 啟動 Sidecar
   createWindow();
   setupIpc();
 
@@ -72,6 +129,11 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+
+app.on("before-quit", () => {
+  stopSidecar(); // 確保退出時關閉 Sidecar
+});
+
 function setupIpc(): void {
   ipcMain.handle(IPC_CHANNELS.GET_ALL_TASKS, async () => {
     return await taskRepo.getAllTasks();

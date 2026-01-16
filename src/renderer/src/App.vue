@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import { useTaskStore } from "./store/useTaskStore";
+import { useSidecarStore } from "./store/useSidecarStore";
 
 const taskStore = useTaskStore();
+const sidecarStore = useSidecarStore();
 
 onMounted(() => {
   taskStore.fetchTasks();
+  sidecarStore.startHealthCheck(); // 啟動 Sidecar 健康檢查
+});
+
+onUnmounted(() => {
+  sidecarStore.stopHealthCheck(); // 停止健康檢查
 });
 </script>
 
@@ -50,7 +57,9 @@ onMounted(() => {
           class="p-4 glass-card bg-white/5 text-[10px] text-slate-500 uppercase tracking-tighter"
         >
           Sidecar:
-          <span class="text-emerald-500 font-bold ml-1">Stateless</span>
+          <span :class="sidecarStore.statusColor" class="font-bold ml-1">{{
+            sidecarStore.statusText
+          }}</span>
         </div>
       </div>
     </aside>

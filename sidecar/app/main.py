@@ -11,6 +11,16 @@ from sidecar.infrastructure.dmhy_downloader import DMHYDownloader
 
 app = FastAPI(title="OpusED Sidecar API (Stateless)")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 基礎設施實例
 metadata_provider = BangumiMetadataProvider()
 downloaders = [YouTubeDownloader(), DMHYDownloader()]
