@@ -51,7 +51,6 @@ export class TaskRepository {
     // 從 Sidecar 獲取所有活躍任務的實時狀態
     try {
       const response = await axios.get(`${SIDECAR_URL}/tasks`);
-      console.log("[TaskRepository] Sidecar /tasks response:", response.data);
       const sidecarTasks = response.data as Array<{
         task_id: string;
         anime_title: string;
@@ -68,12 +67,9 @@ export class TaskRepository {
         } | null;
       }>;
 
-      console.log("[TaskRepository] Local tasks cache:", this.tasksCache.map(t => ({ id: t.id, status: t.status })));
-
       // 將 Sidecar 的任務狀態合併到本地緩存
       for (const st of sidecarTasks) {
         const localTask = this.tasksCache.find((t) => t.id === st.task_id);
-        console.log(`[TaskRepository] Matching task_id=${st.task_id}, found=${!!localTask}`);
         if (localTask) {
           // 更新本地任務的狀態
           localTask.status = st.status as TaskStatus;
