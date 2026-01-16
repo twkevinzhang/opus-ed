@@ -2,6 +2,10 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import os
+import logging
+
+# 配置 Root Logger 為 INFO
+logging.basicConfig(level=logging.INFO)
 
 from sidecar.domain.models import Source, DownloadMode, TaskStatus, Task, Metadata
 from sidecar.application.use_cases import DownloadTaskUseCase, SearchMetadataUseCase

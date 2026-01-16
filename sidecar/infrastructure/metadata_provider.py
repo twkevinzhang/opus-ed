@@ -38,6 +38,7 @@ class BangumiMetadataProvider(IMetadataProvider):
                 
                 # 取第一個結果的 ID
                 subject_id = data["list"][0]["id"]
+                logger.error(f'subject_id: {subject_id}')
                 anime_name_cn = data["list"][0].get("name_cn") or data["list"][0].get("name")
                 
                 # 2. 獲取詳細資訊 (API v0)
