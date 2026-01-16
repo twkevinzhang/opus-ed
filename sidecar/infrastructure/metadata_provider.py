@@ -1,7 +1,10 @@
 import httpx
-from typing import List, Optional
+import logging
+from typing import List, Optional, Dict, Any
 from sidecar.domain.models import Metadata
 from sidecar.domain.repositories import IMetadataProvider
+
+logger = logging.getLogger(__name__)
 
 class BangumiMetadataProvider(IMetadataProvider):
     def __init__(self, base_url: str = "https://api.bgm.tv"):
@@ -10,47 +13,94 @@ class BangumiMetadataProvider(IMetadataProvider):
     async def get_metadata(self, anime_title: str, token: Optional[str] = None) -> List[Metadata]:
         """
         搜尋動畫並獲取其角色、曲目資訊。
-        註：這裡目前先實作搜尋邏輯框架，具體 API 欄位對應需精細調整。
         """
-        headers = {}
+        headers = {
+            "User-Agent": "twkevinzhang/OpusED (https://github.com/twkevinzhang/OpusED)",
+            "Accept": "application/json"
+        }
         if token:
             headers["Authorization"] = f"Bearer {token}"
-        headers["User-Agent"] = "twkevinzhang/OpusED (https://github.com/twkevinzhang/OpusED)"
 
-        async with httpx.AsyncClient(headers=headers, timeout=10.0) as client:
-            # 1. 搜尋條目
-            search_url = f"{self.base_url}/search/subject/{anime_title}"
-            params = {"type": 2}  # 2 為動畫
-            response = await client.get(search_url, params=params)
-            response.raise_for_status()
-            
-            data = response.json()
-            if not data.get("list"):
+        async with httpx.AsyncClient(headers=headers, timeout=12.0, follow_redirects=True) as client:
+            try:
+                # 1. 搜尋條目
+                search_url = f"{self.base_url}/search/subject/{anime_title}"
+                params = {"type": 2}  # 2 為動畫
+                response = await client.get(search_url, params=params)
+                response.raise_for_status()
+                
+                data = response.json()
+                if not data.get("list"):
+                    logger.warning(f"Bangumi 找不到動畫: {anime_title}")
+                    return []
+                
+                # 取第一個結果的 ID
+                subject_id = data["list"][0]["id"]
+                anime_name_cn = data["list"][0].get("name_cn") or data["list"][0].get("name")
+                
+                # 2. 獲取詳細資訊 (API v0)
+                subject_url = f"{self.base_url}/v0/subjects/{subject_id}"
+                subject_resp = await client.get(subject_url)
+                subject_resp.raise_for_status()
+                subject_info = subject_resp.json()
+                
+                results = []
+                infobox = subject_info.get("infobox", [])
+                
+                # 嘗試從 infobox 中提取 OP/ED
+                for item in infobox:
+                    label = item.get("label", "")
+                    value = item.get("value", "")
+                    
+                    # 匹配 OP, ED, 主題曲等標籤
+                    metatype = None
+                    if "OP" in label.upper() or "片頭" in label:
+                        metatype = "OP"
+                    elif "ED" in label.upper() or "片尾" in label:
+                        metatype = "ED"
+                    elif "主題" in label:
+                        metatype = "Theme"
+                    
+                    if metatype and isinstance(value, str):
+                        # 簡單解析：通常格式為 "歌名" 或 "歌名 / 歌手"
+                        # 這裡做基礎處理，未來可增加更強的 regex
+                        parts = value.split("/")
+                        song_title = parts[0].strip().strip("「」『』\" ")
+                        artist = parts[1].strip() if len(parts) > 1 else "未知歌手"
+                        
+                        results.append(Metadata(
+                            anime_title=anime_name_cn,
+                            song_title=song_title,
+                            artist=artist,
+                            type=metatype,
+                            bangumi_id=str(subject_id)
+                        ))
+                    elif metatype and isinstance(value, list):
+                        # 有時 value 是一個列表（多首 OP/ED）
+                        for sub_item in value:
+                            if isinstance(sub_item, dict) and "v" in sub_item:
+                                v_str = sub_item["v"]
+                                parts = v_str.split("/")
+                                results.append(Metadata(
+                                    anime_title=anime_name_cn,
+                                    song_title=parts[0].strip().strip("「」『』\" "),
+                                    artist=parts[1].strip() if len(parts) > 1 else "未知歌手",
+                                    type=metatype,
+                                    bangumi_id=str(subject_id)
+                                ))
+
+                # 如果 infobox 沒抓到，至少回傳一個基礎資訊供使用者手動輸入
+                if not results:
+                    results.append(Metadata(
+                        anime_title=anime_name_cn,
+                        song_title="[請輸入歌曲]",
+                        artist="[請輸入歌手]",
+                        type="OP/ED",
+                        bangumi_id=str(subject_id)
+                    ))
+                
+                return results
+
+            except Exception as e:
+                logger.error(f"Bangumi 獲取元數據失敗: {e}")
                 return []
-            
-            # 取第一個結果的 ID
-            subject_id = data["list"][0]["id"]
-            
-            # 2. 獲取章節/曲目資訊 (EPs)
-            # 在 Bangumi 中，歌曲通常存在於 "crt" 或特定的 "ep" 描述中
-            # 為了 Spec 準確性，我們這裡模擬返回格式，後續對接具體 EP 欄位
-            subject_url = f"{self.base_url}/v0/subjects/{subject_id}"
-            subject_resp = await client.get(subject_url)
-            subject_resp.raise_for_status()
-            subject_info = subject_resp.json()
-            
-            # 假設性邏輯：解析 subject_info 中的 OP/ED 字串
-            # 實際開發中可能需要獲取 /subjects/{id}/characters 或解析 info_box
-            results = []
-            
-            # 範例性回傳（待進一步解析 info_box）
-            # 這裡先回傳一個包含搜尋到動畫名稱的 Placeholder，稍後在單元測試中 Mock
-            results.append(Metadata(
-                anime_title=subject_info.get("name_cn") or subject_info.get("name"),
-                song_title="待解析歌曲",
-                artist="待解析歌手",
-                type="OP/ED",
-                bangumi_id=str(subject_id)
-            ))
-            
-            return results

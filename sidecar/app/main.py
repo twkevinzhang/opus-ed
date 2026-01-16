@@ -1,82 +1,76 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 import os
 
-from sidecar.domain.models import Source, DownloadMode, TaskStatus, Source as SourceEnum
-from sidecar.domain.repositories import IMetadataProvider, IDownloader, ITaskRepository
-from sidecar.application.use_cases import CreateBatchTaskUseCase, DownloadTaskUseCase
-
+from sidecar.domain.models import Source, DownloadMode, TaskStatus, Task, Metadata
+from sidecar.application.use_cases import DownloadTaskUseCase, SearchMetadataUseCase
 from sidecar.infrastructure.metadata_provider import BangumiMetadataProvider
 from sidecar.infrastructure.youtube_downloader import YouTubeDownloader
 from sidecar.infrastructure.dmhy_downloader import DMHYDownloader
-from sidecar.infrastructure.repositories import JSONTaskRepository
 
-app = FastAPI(title="OpusED Sidecar API")
+app = FastAPI(title="OpusED Sidecar API (Stateless)")
 
-# 基礎設施實例 (Singleton-like patterns at app level)
+# 基礎設施實例
 metadata_provider = BangumiMetadataProvider()
-task_repo = JSONTaskRepository()
 downloaders = [YouTubeDownloader(), DMHYDownloader()]
 
 # 用例實例
-create_batch_use_case = CreateBatchTaskUseCase(metadata_provider, task_repo)
-download_task_use_case = DownloadTaskUseCase(downloaders, task_repo)
+download_task_use_case = DownloadTaskUseCase(downloaders)
+search_metadata_use_case = SearchMetadataUseCase(metadata_provider)
 
-class BatchCreateRequest(BaseModel):
-    titles: List[str]
+class SearchRequest(BaseModel):
+    title: str
+    token: Optional[str] = None
+
+class DownloadRequest(BaseModel):
+    # 此 Request 結構應與 Task Domain Model 保持一致
+    anime_title: str
     target_dir: str
-    source: str  # "youtube" or "dmhy"
-    dmhy_mode: str = "video" # "video" or "torrent"
-    bangumi_token: Optional[str] = None
+    source: str
+    dmhy_mode: str = "video"
+    metadata: Optional[dict] = None
+    custom_keywords: Optional[str] = None
 
-class TaskUpdate(BaseModel):
-    anime_title: Optional[str] = None
-    target_dir: Optional[str] = None
-    source: Optional[str] = None
-    dmhy_mode: Optional[str] = None
+@app.get("/metadata/search")
+async def search_metadata(title: str, token: Optional[str] = None):
+    """提供搜尋服務介面"""
+    return await search_metadata_use_case.execute(title, token=token)
 
-@app.post("/tasks/batch")
-async def create_batch(req: BatchCreateRequest):
+@app.post("/download")
+async def execute_download(req: DownloadRequest):
+    """
+    執行單次下載任務 (無狀態)。
+    由 Electron 傳入完整任務資訊，Sidecar 僅負責背景執行並回傳即時狀態。
+    注意：此處為簡化版實作，正式版可考慮使用 WebSocket 回傳進度。
+    """
     try:
-        source_enum = Source(req.source)
-        mode_enum = DownloadMode(req.dmhy_mode)
-        tasks = await create_batch_use_case.execute(
-            req.titles, req.target_dir, source_enum, mode_enum, req.bangumi_token
+        # 重建 Task 實體用於下載器
+        task_metadata = None
+        if req.metadata:
+            task_metadata = Metadata(**req.metadata)
+            
+        task = Task(
+            anime_title=req.anime_title,
+            target_dir=req.target_dir,
+            source=Source(req.source),
+            dmhy_mode=DownloadMode(req.dmhy_mode),
+            metadata=task_metadata,
+            custom_keywords=req.custom_keywords
         )
-        return {"tasks": tasks}
+        
+        success = await download_task_use_case.execute(task)
+        
+        return {
+            "success": success,
+            "task_id": task.id,
+            "status": task.status.value,
+            "progress": task.progress,
+            "error_message": task.error_message
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@app.get("/tasks")
-async def list_tasks():
-    return await task_repo.list_all()
-
-@app.get("/tasks/{task_id}")
-async def get_task(task_id: str):
-    task = await task_repo.get_by_id(task_id)
-    if not task: raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-@app.post("/tasks/{task_id}/download")
-async def start_download(task_id: str, background_tasks: BackgroundTasks):
-    # 這裡使用 BackgroundTasks 進行非同步執行，不阻塞 API
-    background_tasks.add_task(download_task_use_case.execute, task_id)
-    return {"message": "Download started in background"}
-
-@app.patch("/tasks/{task_id}")
-async def update_task(task_id: str, update: TaskUpdate):
-    task = await task_repo.get_by_id(task_id)
-    if not task: raise HTTPException(status_code=404, detail="Task not found")
-    
-    if update.anime_title: task.anime_title = update.anime_title
-    if update.target_dir: task.target_dir = update.target_dir
-    if update.source: task.source = Source(update.source)
-    if update.dmhy_mode: task.dmhy_mode = DownloadMode(update.dmhy_mode)
-    
-    await task_repo.update(task)
-    return task
-
 @app.get("/health")
 def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "service": "OpusED-Sidecar", "stateless": True}

@@ -43,14 +43,12 @@ pnpm run dev
 
 ## 🏗️ 架構概覽 (DDD) {#architecture}
 
-OpusED 採用 **Sidecar + DDD (領域驅動設計)**。將繁重的爬蟲與下載任務委託給 Python 被動服務。
-
-- **Frontend**: Electron + Vue 3 (Vite + pnpm)。
-- **Sidecar**: FastAPI (Python)，處理非同步 Wiki 爬取與 YouTube 下載。
-- **DDD 分層**:
-  - **Domain**: 核心業務邏輯，不依賴外部庫。
-  - **Application**: 業務流程編排。
-  - **Infrastructure**: 持久化 (JSON)、爬蟲工具、API 框架實作。
+- **Frontend (Orchestrator)**: Electron + Vue 3。負責導航、任務狀態管理、以及 **JSON 資料持久化**。
+- **Sidecar (Service)**: FastAPI (Python)。純粹的執行層，負責非同步爬蟲與下載任務，**不存儲系統狀態**。
+- **DDD 分層 (前端與後端分別實作)**:
+  - **Domain**: 定義核心實體 (Task, Metadata)。
+  - **Application**: 前端處理批次管理與流程；後端處理搜尋與下載調度。
+  - **Infrastructure**: 前端處理 IPC 與檔案 IO；後端實作爬蟲工具 (yt-dlp, BeautifulSoup)。
 
 ---
 

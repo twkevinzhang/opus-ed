@@ -34,6 +34,7 @@ class Task:
     source: Source = Source.YOUTUBE
     dmhy_mode: DownloadMode = DownloadMode.VIDEO
     metadata: Optional[Metadata] = None
+    custom_keywords: Optional[str] = None
     status: TaskStatus = TaskStatus.PENDING
     progress: float = 0.0
     error_message: Optional[str] = None
