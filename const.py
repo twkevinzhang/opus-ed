@@ -10,7 +10,7 @@ import requests
 # info
 DEVELOPMENT = False
 __version__ = 0.2
-PROJECT_NAME="OPED-Getter"
+PROJECT_NAME="OpusED"
 
 # File Name
 date=datetime.now().strftime('%Y%m%d%H%M%S')
