@@ -56,13 +56,14 @@ Sidecar 側嚴格遵守 **領域驅動設計 (Domain-Driven Design)**：
 
 1. **反覆確認**: 若需求描述涉及業務邏輯變更，**必須**先向使用者詢問細節，不得盲目猜測。
 2. **層級隔離**: 修改代碼時檢查是否破壞了 DDD 依賴原則（高層不應依賴低層）。
-3. **Git 作者規範**: 提交代碼時，應注意作者資訊通常為以下之一或由使用者指定：
+3. **依賴管理**: 禁止在未經使用者同意的情況下，擅自升級、降級依賴，或是修改環境 tsconfig 等設定。
+4. **Git 作者規範**: 提交代碼時，應注意作者資訊通常為以下之一或由使用者指定：
    - `Gemini 3 Flash <google-bot@users.noreply.github.com>`
    - `Gemini 3 Pro <google-bot@users.noreply.github.com>`
    - `Sonnet 4.5 <noreply@anthropic.com>`
    - `twkevinzhang <twkevinzhang@gmail.com>`
-4. **非同步優先**: 所有 Python IO 必須為 `async`。
-5. **Token 節約**: 優先使用 `diff` 或 `replace_file_content`。
+5. **非同步優先**: 所有 Python IO 必須為 `async`。
+6. **Token 節約**: 優先使用 `diff` 或 `replace_file_content`。
 
 ---
 
