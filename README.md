@@ -1,25 +1,52 @@
 # OpusED
 
-OpusED 是一款現代化的動畫主題曲 (OP/ED) 獲取工具，旨在幫助動漫愛好者輕鬆蒐集與管理喜愛的歌曲。
+OpusED is a modern tool designed to fetch and manage Anime Opening and Ending (OP/ED) themes effortlessly.
 
-## 📥 下載與安裝
+[繁體中文版 (README-zhTW.md)](README-zhTW.md)
 
-對於一般使用者，請前往 [Releases 頁面](https://github.com/twkevinzhang/opus-ed/releases) 下載適用於您作業系統的最新版本。
+## 📥 Download & Installation
 
-## ✨ 核心特色
-
-- **批次處理**：一次輸入多個動畫標題，自動搜尋對應曲目。
-- **多來源支援**：整合 YouTube (yt-dlp) 與 DMHY (動漫花園)。
-- **無狀態設計**：為未來 SaaS 化預留擴展性。
-- **直觀介面**：美觀且易用的 Electron + Vue 3 桌面端體驗。
-
-## 🛠️ 開發者指南
-
-如果您想參與開發、自行建置或了解技術細節，請參閱我們的相關文件：
-
-- **[DEVELOPMENT.md](DEVELOPMENT.md)**：環境建置與啟動流程（快速上手只需 5 分鐘！）。
-- **[CONTRIBUTING.md](CONTRIBUTING.md)**：貢獻規範、代碼風格 (DDD/TDD) 與 Git 提交規範。
+For regular users, please visit our **[Releases Page](https://github.com/twkevinzhang/opus-ed/releases)** to download the latest version for your operating system.
 
 ---
 
-_最初是為了蒐集喜愛的動漫歌曲而生的專案。現在，它正走向現代化。_
+## 🚀 How to Use
+
+### 1. Dashboard Overview
+
+Upon launching the app, you'll see a clean dashboard providing an overview of your current tasks and sidecar status.
+![Dashboard](docs/dashboard.png)
+
+### 2. Batch Task Initialization
+
+Enter your anime titles (one per line). Choose your source (YouTube or DMHY) and set your download path.
+
+> [!TIP]
+> The download path now defaults to your system's "Downloads" folder!
+
+![Batch Input](docs/batch-input.png)
+
+### 3. Metadata Preview & Edit
+
+Before starting the download, you can preview and edit the metadata to ensure everything is correct.
+![Preview Edit](docs/preview-edit.png)
+
+---
+
+## ✨ Key Features
+
+- **Batch Processing**: Search for multiple anime titles at once.
+- **Multiple Sources**: Integrated support for YouTube (via yt-dlp) and DMHY.
+- **Modern UI**: A premium Electron + Vue 3 experience with dark mode and smooth animations.
+- **Smart Defaults**: Intelligent path handling and metadata fetching.
+
+## 🛠️ Developer Guide
+
+If you wish to contribute or build from source:
+
+- **[DEVELOPMENT.md](DEVELOPMENT.md)**: Setup and local execution.
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Standards and conventions.
+
+---
+
+_Helping anime lovers collect their favorite tunes since 2026._
