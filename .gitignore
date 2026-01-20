@@ -142,3 +142,5 @@ cython_debug/
 node_modules
 out
 .DS_Store
+tsconfig.node.tsbuildinfo
+tsconfig.web.tsbuildinfo

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { Task, Source, DownloadMode } from "../../../shared/models";
+import type { Task } from "../../../shared/models";
+import { Source, DownloadMode } from "../../../shared/models";
 
 export const useTaskStore = defineStore("tasks", {
   state: () => ({

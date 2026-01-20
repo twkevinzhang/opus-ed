@@ -1,0 +1,38 @@
+{
+  appId: "dev.twkevinzhang.opus-ed",
+  productName: "OpusED",
+  directories: {
+    output: "dist/electron",
+  },
+  files: [
+    "out/**/*",
+    "package.json",
+    {
+      from: "node_modules",
+      to: "node_modules",
+      filter: ["**/*"],
+    },
+  ],
+  asar: true,
+  asarUnpack: ["resources/sidecar/**"],
+  extraResources: [
+    {
+      from: "dist/sidecar",
+      to: "sidecar",
+      filter: ["**/*"],
+    },
+  ],
+  win: {
+    target: ["portable"],
+  },
+  mac: {
+    target: ["dmg", "zip"],
+  },
+  publish: [
+    {
+      provider: "github",
+      owner: "twkevinzhang",
+      repo: "opus-ed",
+    },
+  ],
+}

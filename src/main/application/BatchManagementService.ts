@@ -19,7 +19,7 @@ export class BatchManagementService {
     targetDir: string,
     source: string,
     dmhyMode: string,
-    bangumiToken?: string
+    bangumiToken?: string,
   ): Promise<Task[]> {
     const newTasks: Task[] = [];
 
@@ -40,8 +40,8 @@ export class BatchManagementService {
                 targetDir,
                 source,
                 dmhyMode,
-                meta
-              )
+                meta,
+              ),
             );
           }
         }
@@ -60,7 +60,7 @@ export class BatchManagementService {
     targetDir: string,
     source: string,
     dmhyMode: string,
-    metadata?: Metadata
+    metadata?: Metadata,
   ): Task {
     const now = new Date().toISOString();
     return {
@@ -92,7 +92,7 @@ export class BatchManagementService {
       await this.taskRepo.saveTask(task);
 
       // 調用 Sidecar 啟動下載（異步，立即返回）
-      const response = await axios.post(`${SIDECAR_URL}/download`, {
+      await axios.post(`${SIDECAR_URL}/download`, {
         task_id: task.id, // 傳入本地 task ID，確保兩端一致
         anime_title: task.anime_title,
         target_dir: task.target_dir,

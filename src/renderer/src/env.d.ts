@@ -10,6 +10,8 @@ interface SidecarAPI {
   createBatchTasks: (data: any) => Promise<any>;
   startDownload: (taskId: string) => Promise<any>;
   deleteTask: (taskId: string) => Promise<any>;
+  getDownloadPath: () => Promise<string>;
+  selectDirectory: () => Promise<string | null>;
 }
 
 declare global {

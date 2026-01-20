@@ -28,7 +28,7 @@
         "--context",
         "claude-code",
         "--project",
-        "/Users/zhangzhenlong/Projects/EhLink-Getter"
+        "opus-ed"
       ],
       "env": {}
     },
