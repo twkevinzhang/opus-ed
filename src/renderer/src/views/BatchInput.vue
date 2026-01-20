@@ -103,21 +103,34 @@ const handleNext = async () => {
           <label class="text-sm font-semibold text-slate-400 ml-1"
             >下載來源</label
           >
-          <select v-model="source" class="input-field cursor-pointer">
-            <option :value="Source.YOUTUBE">YouTube (最佳音質/畫質)</option>
-            <option :value="Source.DMHY">動漫花園 (BT 資源)</option>
-          </select>
-        </div>
-
-        <!-- DMHY 模式 -->
-        <div v-if="source === Source.DMHY" class="flex flex-col gap-2">
-          <label class="text-sm font-semibold text-slate-400 ml-1"
-            >DMHY 模式</label
+          <div
+            class="flex p-1 bg-slate-800/50 rounded-xl border border-white/5 gap-1"
           >
-          <select v-model="dmhyMode" class="input-field cursor-pointer">
-            <option :value="DownloadMode.VIDEO">自動下載影片 (建議)</option>
-            <option :value="DownloadMode.TORRENT">僅存儲種子檔案</option>
-          </select>
+            <button
+              type="button"
+              @click="source = Source.YOUTUBE"
+              :class="[
+                'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200',
+                source === Source.YOUTUBE
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5 border border-transparent',
+              ]"
+            >
+              YouTube
+            </button>
+            <button
+              type="button"
+              @click="source = Source.DMHY"
+              :class="[
+                'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200',
+                source === Source.DMHY
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5 border border-transparent',
+              ]"
+            >
+              動漫花園
+            </button>
+          </div>
         </div>
 
         <!-- Bangumi Token -->
@@ -131,6 +144,41 @@ const handleNext = async () => {
             class="input-field"
             placeholder="提高 API 成功率"
           />
+        </div>
+
+        <!-- DMHY 模式 -->
+        <div v-if="source === Source.DMHY" class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-slate-400 ml-1"
+            >DMHY 模式</label
+          >
+          <div
+            class="flex p-1 bg-slate-800/50 rounded-xl border border-white/5 gap-1"
+          >
+            <button
+              type="button"
+              @click="dmhyMode = DownloadMode.VIDEO"
+              :class="[
+                'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200',
+                dmhyMode === DownloadMode.VIDEO
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5 border border-transparent',
+              ]"
+            >
+              自動下載影片
+            </button>
+            <button
+              type="button"
+              @click="dmhyMode = DownloadMode.TORRENT"
+              :class="[
+                'flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all duration-200',
+                dmhyMode === DownloadMode.TORRENT
+                  ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-white/5 border border-transparent',
+              ]"
+            >
+              僅存儲種子
+            </button>
+          </div>
         </div>
       </div>
 
@@ -147,3 +195,9 @@ const handleNext = async () => {
     </div>
   </div>
 </template>
+<style scoped>
+.input-field::placeholder {
+  color: color-mix(in srgb, var(--color-slate-500), transparent);
+  opacity: 0.6;
+}
+</style>
