@@ -1,6 +1,6 @@
 {
   "name": "opus-ed",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "twkevinzhang",
   "description": "OpusED: AI-powered Op/Ed Getter",
   "type": "module",
