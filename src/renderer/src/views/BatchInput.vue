@@ -67,7 +67,7 @@ const handleNext = async () => {
         >
         <textarea
           v-model="rawTitles"
-          class="input-field scrollable min-h-[200px] resize-none"
+          class="input-field scrollable min-h-[200px]"
           placeholder="例如：
 葬送的芙莉蓮
 我推的孩子"

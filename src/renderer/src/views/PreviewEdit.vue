@@ -31,7 +31,7 @@ const getDefaultKeywords = (task: any) => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full overflow-hidden">
+  <div class="flex flex-col">
     <div class="flex justify-between items-center mb-8">
       <h2
         class="text-3xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"
@@ -60,7 +60,7 @@ const getDefaultKeywords = (task: any) => {
     </div>
 
     <!-- 任務清單 -->
-    <div v-else class="flex-1 scrollable space-y-4">
+    <div v-else class="flex-1 space-y-4">
       <div
         v-for="task in tasks"
         :key="task.id"

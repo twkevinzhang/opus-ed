@@ -65,7 +65,7 @@ onUnmounted(() => {
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col p-8 overflow-hidden">
+    <main class="flex-1 flex flex-col p-8 overflow-y-auto">
       <router-view v-slot="{ Component }">
         <transition
           enter-active-class="transition duration-300 ease-out"

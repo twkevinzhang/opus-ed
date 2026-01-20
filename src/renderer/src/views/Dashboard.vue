@@ -36,7 +36,7 @@ const getStatusLabel = (status: string) => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full overflow-hidden">
+  <div class="flex flex-col">
     <!-- 標題與統計 -->
     <div class="flex justify-between items-end mb-8">
       <div>
@@ -71,7 +71,7 @@ const getStatusLabel = (status: string) => {
     </div>
 
     <!-- 監控清單 -->
-    <div v-else class="flex-1 scrollable space-y-3">
+    <div v-else class="flex-1 space-y-3">
       <div
         v-for="task in tasks"
         :key="task.id"
@@ -108,7 +108,7 @@ const getStatusLabel = (status: string) => {
 
         <!-- 進度條 -->
         <div class="flex items-center gap-4">
-          <div class="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden">
+          <div class="flex-1 h-1.5 bg-slate-900 rounded-full">
             <div
               class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500 ease-out"
               :style="{ width: task.progress + '%' }"
