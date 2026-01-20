@@ -1,24 +1,20 @@
-/// <reference types="vite/client" />
+import { ElectronAPI } from "@electron-toolkit/preload";
 
-declare module "*.vue" {
-  import type { DefineComponent } from "vue";
-  const component: DefineComponent<{}, {}, any>;
-  export default component;
+interface SidecarAPI {
+  getConfig: () => Promise<any>;
+  checkSidecarHealth: () => Promise<{ success: boolean }>;
+  storeSet: (key: string, val: any) => Promise<void>;
+  storeGet: (key: string) => Promise<any>;
+  getTasks: () => Promise<any>;
+  getHistory: () => Promise<any>;
+  createBatchTasks: (data: any) => Promise<any>;
+  startDownload: (taskId: string) => Promise<any>;
+  deleteTask: (taskId: string) => Promise<any>;
 }
 
-interface Window {
-  electron: import("@electron-toolkit/preload").ElectronAPI;
-  api: {
-    getTasks: () => Promise<import("../../shared/models").Task[]>;
-    getHistory: () => Promise<import("../../shared/models").Task[]>;
-    createBatchTasks: (data: {
-      titles: string[];
-      targetDir: string;
-      source: string;
-      dmhyMode: string;
-      token?: string;
-    }) => Promise<import("../../shared/models").Task[]>;
-    startDownload: (taskId: string) => Promise<void>;
-    deleteTask: (taskId: string) => Promise<void>;
-  };
+declare global {
+  interface Window {
+    electron: ElectronAPI;
+    api: SidecarAPI;
+  }
 }

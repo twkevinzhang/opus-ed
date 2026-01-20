@@ -17,7 +17,7 @@ OpusED 是一款現代化的動畫主題曲 (OP/ED) 獲取工具，旨在幫助�
 
 如果您想參與開發、自行建置或了解技術細節，請參閱我們的相關文件：
 
-- **[DEVELOPMENT.md](docs/DEVELOPMENT.md)**：環境建置與啟動流程（快速上手只需 5 分鐘！）。
+- **[DEVELOPMENT.md](DEVELOPMENT.md)**：環境建置與啟動流程（快速上手只需 5 分鐘！）。
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**：貢獻規範、代碼風格 (DDD/TDD) 與 Git 提交規範。
 
 ---

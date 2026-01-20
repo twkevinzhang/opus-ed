@@ -1,6 +1,10 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
-  "include": ["src/renderer/src/**/*", "src/shared/**/*", "src/renderer/src/env.d.ts"],
+  "include": [
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.vue",
+    "src/shared/**/*"
+  ],
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
