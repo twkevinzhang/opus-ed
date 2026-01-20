@@ -18,6 +18,7 @@ const api = {
   deleteTask: (taskId: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.DELETE_TASK, taskId),
   selectDirectory: () => ipcRenderer.invoke(IPC_CHANNELS.SELECT_DIRECTORY),
+  getDownloadPath: () => ipcRenderer.invoke(IPC_CHANNELS.GET_DOWNLOAD_PATH),
 };
 
 // 使用 contextIsolation 曝露 API

@@ -6,4 +6,5 @@ export const IPC_CHANNELS = {
   START_DOWNLOAD: "start-download",
   DELETE_TASK: "delete-task",
   SELECT_DIRECTORY: "select-directory",
+  GET_DOWNLOAD_PATH: "get-download-path",
 };

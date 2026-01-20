@@ -151,9 +151,9 @@ function setupIpc(): void {
         targetDir,
         source,
         dmhyMode,
-        token
+        token,
       );
-    }
+    },
   );
 
   ipcMain.handle(IPC_CHANNELS.START_DOWNLOAD, async (_, taskId) => {
@@ -175,5 +175,8 @@ function setupIpc(): void {
     }
 
     return result.filePaths[0];
+  });
+  ipcMain.handle(IPC_CHANNELS.GET_DOWNLOAD_PATH, async () => {
+    return app.getPath("downloads");
   });
 }

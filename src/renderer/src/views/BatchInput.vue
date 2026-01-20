@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useTaskStore } from "../store/useTaskStore";
 import { Source, DownloadMode } from "../../../shared/models";
@@ -12,8 +12,14 @@ const targetDir = ref("");
 const source = ref<Source>(Source.YOUTUBE);
 const dmhyMode = ref<DownloadMode>(DownloadMode.VIDEO);
 const bangumiToken = ref("");
-
 const isProcessing = ref(false);
+
+onMounted(async () => {
+  const defaultPath = await window.api.getDownloadPath();
+  if (defaultPath) {
+    targetDir.value = defaultPath;
+  }
+});
 
 const handleSelectDirectory = async () => {
   const path = await window.api.selectDirectory();
